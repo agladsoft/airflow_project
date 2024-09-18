@@ -1,0 +1,28 @@
+name: 'dbt_postgres_db'
+version: '1.0.0'
+config-version: 2
+
+# Настройка профиля подключения, указанного в profiles.yml
+profile: 'postgres_profile'
+
+# Папка, где находятся модели dbt
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Папка для хранения временных файлов и артефактов
+target-path: "target"
+
+# Папка для хранения скомпилированных SQL-файлов
+clean-targets:
+  - "target"
+  - "dbt_modules"
+
+# Доступ к моделям
+models:
+  postgres_db:
+    staging:
+      materialized: view

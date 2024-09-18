@@ -1,0 +1,19 @@
+clickhouse_profile:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      host: clickhouse  # или IP-адрес базы данных
+      user: default  # Имя пользователя для подключения
+      password: 6QVnYsC4iSzz  # Пароль пользователя
+      port: 8123  # Порт подключения к базе данных
+      schema: default  # Схема, в которой будут создаваться модели dbt
+#    prod:
+#      type: postgres
+#      host: production_host
+#      user: airflow
+#      pass: airflow
+#      port: 5432
+#      dbname: airflow
+#      schema: marketing
+#      threads: 4

@@ -1,0 +1,20 @@
+postgres_profile:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres  # или IP-адрес базы данных
+      user: airflow  # Имя пользователя для подключения
+      password: airflow  # Пароль пользователя
+      port: 5432  # Порт подключения к базе данных
+      dbname: airflow  # Название базы данных
+      schema: marketing  # Схема, в которой будут создаваться модели dbt
+#    prod:
+#      type: postgres
+#      host: production_host
+#      user: airflow
+#      pass: airflow
+#      port: 5432
+#      dbname: airflow
+#      schema: marketing
+#      threads: 4
