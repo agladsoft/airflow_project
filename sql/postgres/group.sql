@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS b24.group
+(
+    group_id BIGSERIAL PRIMARY KEY,
+    group_name TEXT NOT NULL
+);

@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS b24.requests
     automation_project TEXT NULL,
     creation_date TIMESTAMP NULL,
     closing_date TIMESTAMP NULL,
-    status TEXT NULL,
-    group_ TEXT NULL,
-    tag TEXT NULL,
-    initiator_id BIGINT REFERENCES initiators(initiator_id), -- внешний ключ на инициаторов
-    responsible_id BIGINT REFERENCES responsibles(responsible_id) -- внешний ключ на ответственных
+    initiator_id BIGINT REFERENCES b24.initiators(initiator_id), -- внешний ключ на инициаторов
+    responsible_id BIGINT REFERENCES b24.responsibles(responsible_id), -- внешний ключ на ответственных,
+    status_id BIGINT REFERENCES b24.status(status_id), -- внешний ключ на статусы
+    group_id BIGINT REFERENCES b24.group(group_id), -- внешний ключ на группу,
+    tag_id BIGINT REFERENCES b24.tag(tag_id) -- внешний ключ на теги
 );

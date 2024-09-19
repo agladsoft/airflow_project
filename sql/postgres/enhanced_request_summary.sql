@@ -5,9 +5,9 @@ AS SELECT
     automation_project,
     creation_date,
     closing_date,
-    status,
-    group_ AS group,
-    tag,
+    status_name,
+    group_name,
+    tag_name,
     initiator,
     CASE
         WHEN initiators_department IN (
@@ -31,7 +31,7 @@ AS SELECT
     END AS responsibles_department,
     co_executors,
     CASE
-        WHEN status IN ('Завершена', 'Условно завершена') THEN TRUE
+        WHEN status_name IN ('Завершена', 'Условно завершена') THEN TRUE
         ELSE FALSE
     END AS is_completed,
     CASE
@@ -81,7 +81,7 @@ AS SELECT
 FROM
     b24.combined_requests
 WHERE
-    group_ IN ('ПОЛИТИКА ИНФОБЕЗА', '#HelpDesk')
+    group_name IN ('ПОЛИТИКА ИНФОБЕЗА', '#HelpDesk')
     AND responsible NOT LIKE '%esk%'
     AND responsible NOT LIKE '%Филип%'
     AND responsible NOT LIKE '%Прист%'

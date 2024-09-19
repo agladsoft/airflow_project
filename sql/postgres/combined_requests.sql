@@ -1,28 +1,35 @@
 CREATE OR REPLACE VIEW b24.combined_requests AS
 SELECT
-    req.request_number,
-    req.request_type,
-    req.automation_project,
-    req.creation_date,
-    req.closing_date,
-    req.status,
-    req.group_,
-    req.tag,
-    init.initiator AS initiator,
-    init.initiators_department AS initiators_department,
-    resp.responsible AS responsible,
-    resp.responsibles_department AS responsibles_department,
-    co_exec.co_executors_names AS co_executors
+    req.request_number AS request_number,
+    req.request_type AS request_type,
+    req.automation_project AS automation_project,
+    req.creation_date AS creation_date,
+    req.closing_date AS closing_date,
+    s.status_name AS status_name, -- Присоединение статуса
+    g.group_name AS group_name, -- Присоединение группы
+    t.tag_name AS tag_name, -- Присоединение тега
+    p_init.people_name AS initiator, -- Имя инициатора
+    d_init.department_name AS initiators_department, -- Подразделение инициатора
+    p_resp.people_name AS responsible, -- Имя ответственного
+    d_resp.department_name AS responsibles_department, -- Подразделение ответственного
+    co_exec.co_executors_names AS co_executors -- Исполнители (через запятую)
 FROM
     b24.requests req
-JOIN b24.initiators init ON req.initiator_id = init.initiator_id
-JOIN b24.responsibles resp ON req.responsible_id = resp.responsible_id
+LEFT JOIN b24.initiators init ON req.initiator_id = init.initiator_id
+LEFT JOIN b24.people p_init ON init.people_id = p_init.people_id -- Присоединение таблицы people для инициаторов
+LEFT JOIN b24.department d_init ON init.department_id = d_init.department_id -- Присоединение таблицы department для инициаторов
+LEFT JOIN b24.responsibles resp ON req.responsible_id = resp.responsible_id
+LEFT JOIN b24.people p_resp ON resp.people_id = p_resp.people_id -- Присоединение таблицы people для ответственных
+LEFT JOIN b24.department d_resp ON resp.department_id = d_resp.department_id -- Присоединение таблицы department для ответственных
 LEFT JOIN (
     SELECT
-        request_number,
-        STRING_AGG(co_executor, ', ') AS co_executors_names
+        rce.request_number,
+        STRING_AGG(p.people_name, ', ') AS co_executors_names -- Агрегация соисполнителей в строку
     FROM
         b24.request_co_executors rce
-    JOIN b24.co_executors co_exec ON rce.co_executor_id = co_exec.co_executor_id
-    GROUP BY request_number
-) co_exec ON req.request_number = co_exec.request_number;
+    LEFT JOIN b24.people p ON rce.people_id = p.people_id -- Присоединение соисполнителей к таблице people
+    GROUP BY rce.request_number
+) co_exec ON req.request_number = co_exec.request_number -- Присоединение соисполнителей
+LEFT JOIN b24.status s ON req.status_id = s.status_id -- Присоединение таблицы status
+LEFT JOIN b24."group" g ON req.group_id = g.group_id -- Присоединение таблицы group
+LEFT JOIN b24.tag t ON req.tag_id = t.tag_id; -- Присоединение таблицы tag

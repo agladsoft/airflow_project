@@ -1,64 +1,86 @@
-INSERT INTO b24.initiators (initiator, initiators_department)
-SELECT DISTINCT initiator, initiators_department
-FROM b24_fact
-WHERE initiator IS NOT NULL;
+INSERT INTO b24.initiators (creation_date, closing_date, people_id, department_id)
+SELECT DISTINCT
+  b24_fact.creation_date,
+  b24_fact.closing_date,
+  people.people_id,
+  department.department_id
+FROM public.b24_fact
+JOIN b24.people ON b24_fact.initiator = people.people_name
+JOIN b24.department ON b24_fact.initiators_department = department.department_name;
 
 
 
-INSERT INTO b24.responsibles (responsible, responsibles_department)
-SELECT DISTINCT responsible, responsibles_department
-FROM b24_fact
-WHERE responsible IS NOT NULL;
-
-
-
-INSERT INTO b24.co_executors (co_executor)
-SELECT DISTINCT UNNEST(STRING_TO_ARRAY(co_executors, ', '))
-FROM b24_fact
-WHERE co_executors IS NOT NULL;
+INSERT INTO b24.responsibles (creation_date, closing_date, people_id, department_id)
+SELECT DISTINCT
+  b24_fact.creation_date,
+  b24_fact.closing_date,
+  people.people_id,
+  department.department_id
+FROM public.b24_fact
+JOIN b24.people ON b24_fact.responsible = people.people_name
+JOIN b24.department ON b24_fact.responsibles_department = department.department_name;
 
 
 
 INSERT INTO b24.requests (
     request_number, request_type, automation_project, creation_date, closing_date,
-    status, group_, tag, initiator_id, responsible_id
+    status_id, group_id, tag_id, initiator_id, responsible_id
 )
 SELECT
-    b.number AS request_number,
-    b.request_type,
-    b.automation_project,
-    b.creation_date,
-    b.closing_date,
-    b.status,
-    b.group_,
-    b.tag,
+    f.number AS request_number,
+    f.request_type,
+    f.automation_project,
+    f.creation_date,
+    f.closing_date,
+    s.status_id,
+    g.group_id,
+    t.tag_id,
     i.initiator_id,
     r.responsible_id
-FROM b24_fact b
-JOIN b24.initiators i ON b.initiator = i.initiator
-JOIN b24.responsibles r ON b.responsible = r.responsible
-ON CONFLICT (request_number) DO NOTHING;
+FROM public.b24_fact f
+LEFT JOIN b24.people p_initiator ON f.initiator = p_initiator.people_name
+LEFT JOIN b24.initiators i ON
+    p_initiator.people_id = i.people_id AND
+    f.creation_date = i.creation_date AND
+    (f.closing_date = i.closing_date OR (f.closing_date IS NULL AND i.closing_date IS NULL))
+LEFT JOIN b24.people p_responsible ON f.responsible = p_responsible.people_name
+LEFT JOIN b24.responsibles r ON
+    p_responsible.people_id = r.people_id AND
+    f.creation_date = r.creation_date AND
+    (f.closing_date = r.closing_date OR (f.closing_date IS NULL AND r.closing_date IS NULL))
+LEFT JOIN b24.status s ON f.status = s.status_name
+LEFT JOIN b24."group" g ON f.group_ = g.group_name
+LEFT JOIN b24.tag t ON f.tag = t.tag_name;
 
 
 
--- Создание временной таблицы с развернутыми ко-исполнителями
-CREATE TEMP TABLE temp_co_executors AS
+INSERT INTO b24.request_co_executors (request_number, people_id)
 SELECT
-    b.number AS request_number,
-    co_exec_table.co_executor_id AS co_executor_id,
-    TRIM(co_exec) AS co_executor
-FROM b24_fact b
-JOIN UNNEST(string_to_array(b.co_executors, ', ')) AS co_exec ON true
-JOIN b24.co_executors co_exec_table ON TRIM(co_exec) = co_exec_table.co_executor;
-
-DROP TABLE temp_co_executors
+  r.request_number,
+  p.people_id
+FROM public.b24_fact
+JOIN LATERAL unnest(string_to_array(b24_fact.co_executors, ',')) AS executor_name ON TRUE -- Разделяем строку на части
+JOIN b24.people p ON trim(executor_name) = p.people_name -- Сопоставляем с полем people_name
+JOIN b24.requests r ON b24_fact.number = r.request_number;
 
 
 
--- Вставка данных в request_co_executors из временной таблицы
-INSERT INTO b24.request_co_executors (request_number, co_executor_id)
-SELECT
-    req.request_number,
-    temp.co_executor_id
-FROM b24.requests req
-JOIN temp_co_executors temp ON req.request_number = temp.request_number;
+
+
+
+
+
+
+
+select tag_name, count(*)
+from tag
+group by tag_name
+having count(tag_name) > 1
+
+DELETE FROM tag
+    WHERE tag_id NOT IN
+    (
+        SELECT MAX(tag_id) AS MaxRecordID
+        FROM tag
+        GROUP BY tag_name
+    );

@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS b24.tag
+(
+    tag_id BIGSERIAL PRIMARY KEY,
+    tag_name TEXT NOT NULL
+);
