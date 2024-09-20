@@ -52,9 +52,11 @@ AS SELECT
         ELSE NULL
     END AS dcr_count,
     CASE
-        WHEN closing_date IS NULL THEN (current_timestamp - creation_date) > interval '1 day'
-        ELSE (closing_date - creation_date) > interval '1 day'
-    END AS overdue_indicator,
+        WHEN closing_date IS NULL THEN
+            (DATE_TRUNC('day', current_timestamp) - DATE_TRUNC('day', creation_date)) > interval '1 day'
+        ELSE
+            (DATE_TRUNC('day', closing_date) - DATE_TRUNC('day', creation_date)) > interval '1 day'
+    END AS is_overdue,
     EXTRACT(HOUR FROM creation_date)::int AS creation_hour,
     EXTRACT(HOUR FROM closing_date)::int AS closing_hour,
     creation_date::date AS creation_day,

@@ -5,9 +5,9 @@ AS SELECT
     automation_project,
     creation_date,
     closing_date,
-    status,
-    group_ AS group,
-    tag,
+    status_name,
+    group_name,
+    tag_name,
     initiator,
     CASE
         WHEN initiators_department IN (
@@ -30,7 +30,7 @@ AS SELECT
         ELSE responsibles_department
     END AS responsibles_department,
     co_executors,
-    IF(status IN ('Завершена', 'Условно завершена'), TRUE, FALSE) AS is_completed,
+    IF(status_name IN ('Завершена', 'Условно завершена'), TRUE, FALSE) AS is_completed,
     CASE
         WHEN responsibles_department IN (
             'Управление сетевой и серверной инфраструктурой',
@@ -54,7 +54,7 @@ AS SELECT
             dateDiff('day', creation_date, now()) > 1,
             dateDiff('day', creation_date, closing_date) > 1
         )
-    ) AS overdue_indicator,
+    ) AS is_overdue,
     toHour(creation_date) AS creation_hour,
     toHour(closing_date) AS closing_hour,
     toDate(creation_date) AS creation_day,
@@ -81,7 +81,7 @@ AS SELECT
 FROM
     b24.combined_requests
 WHERE
-    group_ IN ('ПОЛИТИКА ИНФОБЕЗА', '#HelpDesk')
+    group_name IN ('ПОЛИТИКА ИНФОБЕЗА', '#HelpDesk')
     AND responsible NOT LIKE '%esk%'
     AND responsible NOT LIKE '%Филип%'
     AND responsible NOT LIKE '%Прист%'
