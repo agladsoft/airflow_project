@@ -11,22 +11,65 @@ AS SELECT
     initiator,
     CASE
         WHEN initiators_department IN (
-            'Управление эксплуатации',
             'Отдел запуска и сопровождения удаленных объектов',
             'Отдел поддержки пользователей'
         ) THEN 'Управление эксплуатации'
+        WHEN initiators_department IN (
+            'Управление сетевой и серверной инфраструктурой',
+            'Отдел системного администрирования',
+            'Отдел КСБ',
+            'Отдел комплексной системы безопасности',
+            'Отдел мониторинга',
+            'Отдел сети передачи данных',
+            'Группа монтажа СПД'
+        ) THEN 'УССИ'
         WHEN initiators_department LIKE 'Отдел сети передачи данных%' THEN 'УССИ'
-        WHEN initiators_department IN ('УССИ', 'Отдел системного администрирования', 'Отдел КСБ') THEN 'УССИ'
+        WHEN initiators_department IN (
+            'Административно-хозяйственный отдел'
+        ) THEN 'АХО'
+        WHEN initiators_department IN (
+            'Департамент информационных технологий'
+        ) THEN 'ДИТ'
+        WHEN initiators_department IN (
+            'Департамент цифрового развития',
+            'Отдел управления данными',
+            'Группа администрирования корпоративного портала',
+            'Отдел разработки',
+            'Проектный офис.',
+            'Проектный офис'
+        ) THEN 'ДЦР'
         ELSE initiators_department
     END AS initiators_department,
     responsible,
     CASE
         WHEN responsibles_department IN (
-            'Управление эксплуатации',
             'Отдел запуска и сопровождения удаленных объектов',
             'Отдел поддержки пользователей'
         ) THEN 'Управление эксплуатации'
+        WHEN responsibles_department IN (
+            'Управление сетевой и серверной инфраструктурой',
+            'Отдел системного администрирования',
+            'Отдел КСБ',
+            'Отдел комплексной системы безопасности',
+            'Отдел мониторинга',
+            'Отдел СПД',
+            'Группа монтажа СПД'
+        ) THEN 'УССИ'
         WHEN responsibles_department LIKE 'Отдел сети передачи данных%' THEN 'УССИ'
+        WHEN initiators_department IN (
+            'Административно-хозяйственный отдел'
+        ) THEN 'АХО'
+        WHEN initiators_department IN (
+            'Департамент информационных технологий'
+        ) THEN 'ДИТ'
+        WHEN initiators_department IN (
+            'Департамент цифрового развития',
+            'Отдел управления данными',
+            'Группа администрирования корпоративного портала',
+            'Отдел разработки',
+            'Проектный офис.',
+            'Проектный офис'
+        ) THEN 'ДЦР'
         ELSE responsibles_department
     END AS responsibles_department,
     co_executors,
@@ -34,23 +77,6 @@ AS SELECT
         WHEN status_name IN ('Завершена', 'Условно завершена') THEN TRUE
         ELSE FALSE
     END AS is_completed,
-    CASE
-        WHEN responsibles_department IN (
-            'Управление сетевой и серверной инфраструктурой',
-            'Отдел системного администрирования',
-            'Отдел КСБ',
-            'Отдел СПД'
-        ) THEN 1
-        ELSE NULL
-    END AS net_architecture_count,
-    CASE
-        WHEN responsibles_department IN (
-            'Отдел управления данными',
-            'Отдел разработки',
-            'Проектный офис'
-        ) THEN 1
-        ELSE NULL
-    END AS dcr_count,
     CASE
         WHEN closing_date IS NULL THEN
             (DATE_TRUNC('day', current_timestamp) - DATE_TRUNC('day', creation_date)) > interval '1 day'

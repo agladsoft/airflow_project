@@ -9,45 +9,11 @@ AS SELECT
     group_name,
     tag_name,
     initiator,
-    CASE
-        WHEN initiators_department IN (
-            'Управление эксплуатации',
-            'Отдел запуска и сопровождения удаленных объектов',
-            'Отдел поддержки пользователей'
-        ) THEN 'Управление эксплуатации'
-        WHEN initiators_department LIKE 'Отдел сети передачи данных%' THEN 'УССИ'
-        WHEN initiators_department IN ('УССИ', 'Отдел системного администрирования', 'Отдел КСБ') THEN 'УССИ'
-        ELSE initiators_department
-    END AS initiators_department,
+    rename_department(initiators_department) AS initiators_department,
     responsible,
-    CASE
-        WHEN responsibles_department IN (
-            'Управление эксплуатации',
-            'Отдел запуска и сопровождения удаленных объектов',
-            'Отдел поддержки пользователей'
-        ) THEN 'Управление эксплуатации'
-        WHEN responsibles_department LIKE 'Отдел сети передачи данных%' THEN 'УССИ'
-        ELSE responsibles_department
-    END AS responsibles_department,
+    rename_department(responsibles_department) AS responsibles_department,
     co_executors,
     IF(status_name IN ('Завершена', 'Условно завершена'), TRUE, FALSE) AS is_completed,
-    CASE
-        WHEN responsibles_department IN (
-            'Управление сетевой и серверной инфраструктурой',
-            'Отдел системного администрирования',
-            'Отдел КСБ',
-            'Отдел СПД'
-        ) THEN 1
-        ELSE NULL
-    END AS net_architecture_count,
-    CASE
-        WHEN responsibles_department IN (
-            'Отдел управления данными',
-            'Отдел разработки',
-            'Проектный офис'
-        ) THEN 1
-        ELSE NULL
-    END AS dcr_count,
     toBool(
         IF(
             closing_date IS NULL,
