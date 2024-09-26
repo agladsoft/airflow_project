@@ -5,8 +5,8 @@ SELECT DISTINCT
   people.people_id,
   department.department_id
 FROM public.b24_fact
-JOIN b24.people ON b24_fact.initiator = people.people_name
-JOIN b24.department ON b24_fact.initiators_department = department.department_name;
+LEFT JOIN b24.people ON b24_fact.initiator = people.people_name
+LEFT JOIN b24.department ON b24_fact.initiators_department = department.department_name;
 
 
 
@@ -17,8 +17,8 @@ SELECT DISTINCT
   people.people_id,
   department.department_id
 FROM public.b24_fact
-JOIN b24.people ON b24_fact.responsible = people.people_name
-JOIN b24.department ON b24_fact.responsibles_department = department.department_name;
+LEFT JOIN b24.people ON b24_fact.responsible = people.people_name
+LEFT JOIN b24.department ON b24_fact.responsibles_department = department.department_name;
 
 
 

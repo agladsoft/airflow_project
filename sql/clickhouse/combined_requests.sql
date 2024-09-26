@@ -13,4 +13,6 @@ CREATE TABLE IF NOT EXISTS b24.combined_requests
     responsible String,
     responsibles_department Nullable(String),
     co_executors Nullable(String)
-) ENGINE = PostgreSQL('postgres:5432', 'airflow', 'combined_requests', 'airflow', 'airflow', 'b24');
+)
+ENGINE = MergeTree
+ORDER BY initiator;
