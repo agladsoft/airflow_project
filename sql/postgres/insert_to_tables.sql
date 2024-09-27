@@ -59,7 +59,7 @@ SELECT
   r.request_number,
   p.people_id
 FROM public.b24_fact
-JOIN LATERAL unnest(string_to_array(b24_fact.co_executors, ',')) AS executor_name ON TRUE -- Разделяем строку на части
+JOIN LATERAL unnest(string_to_array(b24_fact.co_executors, ', ')) AS executor_name ON TRUE -- Разделяем строку на части
 JOIN b24.people p ON trim(executor_name) = p.people_name -- Сопоставляем с полем people_name
 JOIN b24.requests r ON b24_fact.number = r.request_number;
 
