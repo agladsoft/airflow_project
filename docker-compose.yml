@@ -84,16 +84,16 @@ services:
     restart: always
 
   clickhouse:
-    image: bitnami/clickhouse:24.2.2
+    image: clickhouse/clickhouse-server:24.3.11.7
     container_name: clickhouse
     restart: always
     ports:
       - "8123:8123"
       - "9000:9000"
     volumes:
-      - ./clickhouse:/bitnami/clickhouse
+      - ./clickhouse:/var/lib/clickhouse/
     environment:
-      - CLICKHOUSE_ADMIN_PASSWORD=6QVnYsC4iSzz
+      - CLICKHOUSE_PASSWORD=6QVnYsC4iSzz
 
   dbeaver:
     image: dbeaver/cloudbeaver:24.2.0
