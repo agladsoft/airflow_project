@@ -79,8 +79,9 @@ services:
       - "5432:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
-      interval: 5s
-      retries: 5
+      interval: 60s
+      timeout: 10s
+      retries: 3
     restart: always
 
   clickhouse:
@@ -92,6 +93,11 @@ services:
       - "9000:9000"
     volumes:
       - ./clickhouse:/var/lib/clickhouse/
+    healthcheck:
+      test: wget --no-verbose --tries=1 http://127.0.0.1:8123/ping || exit 1
+      interval: 60s
+      timeout: 10s
+      retries: 3
     environment:
       - CLICKHOUSE_PASSWORD=6QVnYsC4iSzz
 
@@ -119,10 +125,9 @@ services:
       - ./superset_home/requirements.txt:/app/requirements/requirements.txt
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8088/health" ]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
-      start_period: 30s
     depends_on:
       - postgres
       - clickhouse
